@@ -51,41 +51,67 @@ ocsvm = OneClassSVM(kernel='linear', gamma='auto', nu=0.01)
 ocsvm.fit(alice_features)
 
 # Extract features for testing
-incoming_real = X_test[:, 6, :, 0]
-incoming_imag = X_test[:, 6, :, 1]
-incoming_mag = np.abs(incoming_real + 1j * incoming_imag)
+# incoming_real = X_test[:, 6, :, 0]
+# incoming_imag = X_test[:, 6, :, 1]
+# incoming_mag = np.abs(incoming_real + 1j * incoming_imag)
 
-# Scale the test data
-test_real_scaled = scaler.transform(incoming_real)
-test_imag_scaled = scaler.transform(incoming_imag)
-test_mag_scaled = scaler.transform(incoming_mag)
+# # Scale the test data
+# test_real_scaled = scaler.transform(incoming_real)
+# test_imag_scaled = scaler.transform(incoming_imag)
+# test_mag_scaled = scaler.transform(incoming_mag)
 
-test_features = np.column_stack((test_real_scaled, test_imag_scaled, test_mag_scaled))
+# test_features = np.column_stack((test_real_scaled, test_imag_scaled, test_mag_scaled))
 
-for i in range(X_test.shape[0]):
 # for i in range(2):
-    # Extract the current test CIR
-    incoming_real = X_train[i, 2, :, 0]
-    incoming_imag = X_train[i, 2, :, 1]
-    incoming_mag = np.abs(incoming_real + 1j * incoming_imag)
+for i in range(X_test.shape[0]):
+    for j in range(12):
+        # Extract the current test CIR
+        incoming_real = X_test[i, j, :, 0]
+        incoming_imag = X_test[i, j, :, 1]
+        incoming_mag = np.abs(incoming_real + 1j * incoming_imag)
 
-    # Scale the test CIR
-    test_real_scaled = scaler.transform(incoming_real.reshape(1, -1))
-    test_imag_scaled = scaler.transform(incoming_imag.reshape(1, -1))
-    test_mag_scaled = scaler.transform(incoming_mag.reshape(1, -1))
- 
-    # Create a feature vector for the test CIR
-    test_features = np.column_stack((test_real_scaled, test_imag_scaled, test_mag_scaled))
+        # Scale the test CIR
+        test_real_scaled = scaler.transform(incoming_real.reshape(1, -1))
+        test_imag_scaled = scaler.transform(incoming_imag.reshape(1, -1))
+        test_mag_scaled = scaler.transform(incoming_mag.reshape(1, -1))
+    
+        # Create a feature vector for the test CIR
+        test_features = np.column_stack((test_real_scaled, test_imag_scaled, test_mag_scaled))
 
-    # Predict using the OCC-SVM
-    prediction = ocsvm.predict(test_features)
+        # Predict using the OCC-SVM
+        prediction = ocsvm.predict(test_features)
 
-    # If the CIR is accepted, update the data vector
-    if prediction == 1:
-        alice_features = update_features(alice_features, test_features)
-        print(f"CIR {i} accepted, updated features:")
-        # print(alice_features)
+        # If the CIR is accepted, update the data vector
+        if prediction == 1:
+            alice_features = update_features(alice_features, test_features)
+            print(f"CIR {i} accepted, updated features:")
+            # print(alice_features)
 
 
 print(alice_features.shape)
 # The updated alice_features will contain the most recent CIRs
+
+# # Calculate confusion matrix
+# tn, fp, fn, tp = confusion_matrix(true_labels, predictions, labels=[-1, 1]).ravel()
+
+# # print(tn)
+# # print(fp)
+# # print(fn)
+# # print(tp)
+
+# # # Missed Detection Rate (MDR)
+# MDR = fp / (fp + tn)
+# # print(MDR)
+
+# # # False Alarm Rate (FAR)
+# FAR = fn / (fn + tp)
+
+# # # Gamma calculation
+# gamma = (tp + fn) / (tn + fp)
+
+# # # Authentication Rate (AR)
+# AR = (tp + gamma * tn) / ((tp + fn) + gamma * (tn + fp))
+
+# print(f"MDR: {MDR}")
+# print(f"FAR: {FAR}")
+# print(f"AR: {AR}")

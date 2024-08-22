@@ -1,0 +1,15 @@
+    ('t0', 'a0', 0), #0 Bob -> Alice
+    ('t0', 'a1', 0), #1 Bob -> Eve1
+    ('t0', 'a2', 0), #2 Bob -> Eve2 
+    ('a0', 't0', 0), #3 Alice -> Bob * (legitimate channel)
+    ('a0', 'a1', 0), #4 Alice -> Eve1 
+    ('a0', 'a2', 0), #5 Alice -> Eve2
+    ('a1', 't0', 0), #6 Eve1 -> Bob * (illegitimate channel)
+    ('a1', 'a0', 0), #7 Eve1 -> Alice
+    ('a1', 'a2', 0), #8 Eve1 -> Eve2
+    ('a2', 't0', 0), #9 Eve2 -> Bob * (illegitimate channel)
+    ('a2', 'a0', 0), #10 Eve2 -> Alice
+    ('a2', 'a1', 0), #11 Eve2 -> Eve1
+    ('t0', 'a0', 1), #12 Bob -> Alice
+    ('t0', 'a1', 1), #13 Bob -> Eve1
+    ('t0', 'a2', 1)  #14 Bob -> Eve2
