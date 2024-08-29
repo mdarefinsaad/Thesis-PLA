@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import OneClassSVM
+from sklearn.metrics import confusion_matrix
 
 
 # Function to update the data vector
@@ -27,6 +28,7 @@ dataset_slice = data['cirs']
 # Split data into training and test sets
 X_train, X_test = train_test_split(dataset_slice, test_size=0.2, random_state=42)
 
+# ------------------- Training -------------------
 # Extract real and imaginary parts for Alice (channel 3 is the legitimate channel between Alice and Bob)
 alice_real = X_train[:3, 3, :, 0]
 alice_imag = X_train[:3, 3, :, 1]
@@ -50,24 +52,27 @@ ocsvm = OneClassSVM(kernel='linear', gamma='auto', nu=0.01)
 # Train the One-Class SVM
 ocsvm.fit(alice_features)
 
-# Extract features for testing
-# incoming_real = X_test[:, 6, :, 0]
-# incoming_imag = X_test[:, 6, :, 1]
-# incoming_mag = np.abs(incoming_real + 1j * incoming_imag)
 
-# # Scale the test data
-# test_real_scaled = scaler.transform(incoming_real)
-# test_imag_scaled = scaler.transform(incoming_imag)
-# test_mag_scaled = scaler.transform(incoming_mag)
 
-# test_features = np.column_stack((test_real_scaled, test_imag_scaled, test_mag_scaled))
-
-# for i in range(2):
-for i in range(X_test.shape[0]):
-    for j in range(12):
+# ------------------- Testing -------------------
+# Initialize lists to hold true labels and predictions
+true_labels = []
+predictions = []
+print(X_test.shape[0])
+for cir in range(X_test.shape[0]):
+    for channel in range(12):
+        
+        # Determine the true label based on the channel
+        if channel == 3:
+            true_label = 1  # Legitimate user (Alice)
+        else:
+            true_label = -1  # Illegitimate user (Not Alice)
+        
+        true_labels.append(true_label)
+        
         # Extract the current test CIR
-        incoming_real = X_test[i, j, :, 0]
-        incoming_imag = X_test[i, j, :, 1]
+        incoming_real = X_test[cir, channel, :, 0]
+        incoming_imag = X_test[cir, channel, :, 1]
         incoming_mag = np.abs(incoming_real + 1j * incoming_imag)
 
         # Scale the test CIR
@@ -80,38 +85,37 @@ for i in range(X_test.shape[0]):
 
         # Predict using the OCC-SVM
         prediction = ocsvm.predict(test_features)
-
+        predictions.append(prediction[0])
         # If the CIR is accepted, update the data vector
         if prediction == 1:
             alice_features = update_features(alice_features, test_features)
-            print(f"CIR {i} accepted, updated features:")
-            # print(alice_features)
+            ocsvm.fit(alice_features)
+            print(alice_features.shape)
+            print(f"CIR {cir} channel {channel} accepted, model is retrained")
 
 
-print(alice_features.shape)
 # The updated alice_features will contain the most recent CIRs
+# Calculate confusion matrix
+tn, fp, fn, tp = confusion_matrix(true_labels, predictions, labels=[-1, 1]).ravel()
 
-# # Calculate confusion matrix
-# tn, fp, fn, tp = confusion_matrix(true_labels, predictions, labels=[-1, 1]).ravel()
+print(f"tn: {tn}")
+print(f"fp: {fp}")
+print(f"fn: {fn}")
+print(f"tp: {tp}")
 
-# # print(tn)
-# # print(fp)
-# # print(fn)
-# # print(tp)
+# # Missed Detection Rate (MDR)
+MDR = fp / (fp + tn)
+# print(MDR)
 
-# # # Missed Detection Rate (MDR)
-# MDR = fp / (fp + tn)
-# # print(MDR)
+# # False Alarm Rate (FAR)
+FAR = fn / (fn + tp)
 
-# # # False Alarm Rate (FAR)
-# FAR = fn / (fn + tp)
+# # Gamma calculation
+gamma = (tp + fn) / (tn + fp)
 
-# # # Gamma calculation
-# gamma = (tp + fn) / (tn + fp)
+# # Authentication Rate (AR)
+AR = (tp + gamma * tn) / ((tp + fn) + gamma * (tn + fp))
 
-# # # Authentication Rate (AR)
-# AR = (tp + gamma * tn) / ((tp + fn) + gamma * (tn + fp))
-
-# print(f"MDR: {MDR}")
-# print(f"FAR: {FAR}")
-# print(f"AR: {AR}")
+print(f"MDR: {MDR}")
+print(f"FAR: {FAR}")
+print(f"AR: {AR}")
