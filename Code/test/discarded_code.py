@@ -89,3 +89,32 @@ new_header_channels = {
 #         ('t0', 'a0', 1), ('t0', 'a1', 1), ('t0', 'a2', 1)
 #     ]
 # ], dtype=[('transmitter', '<U2'), ('receiver', '<U2'), ('index', 'u1')])
+
+
+real_pl = X_train[0][3][:, 0]
+imag_pl = X_train[0][3][:, 1]
+mag_pl = np.abs(real_pl + 1j * imag_pl)
+
+# Find the index of the peak value in the magnitude
+peak_index = np.argmax(mag_pl)
+
+# Define the range around the peak (20 samples before and 20 after)
+start_index = max(0, peak_index - 20)  # Ensuring we don't go below index 0
+end_index = min(251, peak_index + 21)  # Ensuring we don't go beyond index 250
+
+# Extract the part of the signal around the peak
+real_part_focus = real_pl[start_index:end_index]
+imaginary_part_focus = imag_pl[start_index:end_index]
+
+plt.figure(figsize=(10, 6))
+plt.title('Channel Impulse Response (CIR) for Channel 3')
+plt.plot(real_pl, label='Real focus Part')
+plt.plot(imag_pl, label='Imaginary focus Part')
+plt.plot(real_part_focus, label='Real focus Part')
+plt.plot(imaginary_part_focus, label='Imaginary focus Part')
+# plt.plot(mag_pl, label='Magnitude')
+plt.xlabel('Sample Index')
+plt.ylabel('Amplitude')
+plt.legend()
+plt.grid(True)
+plt.show()
