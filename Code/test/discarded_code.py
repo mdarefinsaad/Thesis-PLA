@@ -118,3 +118,21 @@ plt.ylabel('Amplitude')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+
+#------------------ Spliting the data into training and test sets ------------------
+dataset_slice = data['cirs']
+X_train, X_test = train_test_split(dataset_slice, test_size=0.2, random_state=42)
+
+alice_real = X_train[0, 3, :, 0]
+alice_imag = X_train[0, 3, :, 1]
+alice_mag = np.abs(alice_real + 1j * alice_imag)
+
+scaler = MinMaxScaler()
+
+alice_real_scaled = scaler.fit_transform([alice_real])
+alice_imag_scaled = scaler.fit_transform([alice_imag])
+alice_mag_scaled = scaler.fit_transform([alice_mag])
+
+print(alice_real_scaled)
+
