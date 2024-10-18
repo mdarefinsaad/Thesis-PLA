@@ -136,3 +136,106 @@ alice_mag_scaled = scaler.fit_transform([alice_mag])
 
 print(alice_real_scaled)
 
+
+
+# # Fit the scaler to data
+# scaler.fit(combined_train_features)
+# # Transform the features using the scaler
+# scaled_train_features = scaler.transform(combined_train_features)
+
+# alice_features = scaled_train_features
+
+# # Create labels for your training data (all ones since they're normal)
+# y_train = np.ones(alice_features.shape[0])
+
+# # Define custom scoring function
+# def custom_scorer(y_true, y_pred):
+#     y_pred = np.where(y_pred == 1, 1, 0)
+#     y_true = np.where(y_true == 1, 1, 0)
+#     return f1_score(y_true, y_pred)
+
+# # Set up parameter grid
+# param_grid = {
+#     'nu': [0.001, 0.01, 0.05, 0.1],
+#     'gamma': ['scale', 'auto', 0.01, 0.1, 1],
+#     'kernel': ['rbf', 'linear', 'sigmoid']
+# }
+
+# # Set up cross-validation strategy
+# cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+# # Initialize GridSearchCV
+# grid_search = GridSearchCV(
+#     estimator=OneClassSVM(),
+#     param_grid=param_grid,
+#     scoring=make_scorer(custom_scorer),
+#     cv=cv,
+#     n_jobs=-1
+# )
+
+# # Fit GridSearchCV
+# grid_search.fit(alice_features, y_train)
+
+# # Get the best model
+# best_ocsvm = grid_search.best_estimator_
+
+# # Use the best model
+# ocsvm = best_ocsvm
+
+
+
+
+def estimate_cfo(signal_real, signal_imag):
+    """
+    Estimate Carrier Frequency Offset (CFO) from real and imaginary parts of the signal.
+    Assumes that the signal is in complex baseband format.
+    :param signal_real: Real part of the signal
+    :param signal_imag: Imaginary part of the signal
+    :return: CFO estimate
+    """
+    # Create a complex signal from real and imaginary parts
+    complex_signal = signal_real + 1j * signal_imag
+    
+    # Calculate phase difference between consecutive symbols
+    phase_diff = np.angle(complex_signal[1:] * np.conj(complex_signal[:-1]))
+    
+    # Estimate the average phase difference
+    avg_phase_diff = np.mean(phase_diff)
+    
+    # Convert phase difference to CFO (normalized frequency offset)
+    cfo = avg_phase_diff / (2 * np.pi)
+    return cfo
+
+
+
+    # Use decision_function and apply a custom threshold
+    # decision_scores = ocsvm.decision_function(combine_test_features_scaled)  # Get decision scores
+    # threshold = -0.2  # Custom threshold, adjust this value to tune FP/TP trade-off
+    # prediction = (decision_scores >= threshold).astype(int)  # Apply custom threshold
+    # predictions.append(prediction[0])
+    
+    
+    
+    # init_real_251 = X_train[:7000, 3, :, 0]
+    # init_imag_251 = X_train[:7000, 3, :, 1]
+    # init_features = np.column_stack((init_real_scaled, init_imag_scaled, init_mag_scaled)).reshape(7000, 192)
+    
+    
+    
+    # Calculate performance metrics
+    # MDR = fp / (fp + tn) if (fp + tn) > 0 else 0
+    # FAR = fn / (fn + tp) if (fn + tp) > 0 else 0
+    # gamma = (tp + fn) / (tn + fp) if (tn + fp) > 0 else 0
+    # AR = (tp + gamma * tn) / ((tp + fn) + gamma * (tn + fp)) if ((tp + fn) + gamma * (tn + fp)) > 0 else 0
+    
+    
+    # # Initialize the Lasso model with alpha as a regularization parameter
+# lasso = Lasso(alpha=0.1)  # You can adjust alpha for desired sparsity
+
+# # Fit the Lasso model to find sparse coefficients
+# lasso.fit(dictionary, y)
+
+# # Get the coefficients (sparse representation)
+# coefficients = lasso.coef_
+
+# # print(f"Sparse Coefficients: {coefficients}")

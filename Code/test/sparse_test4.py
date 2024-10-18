@@ -33,7 +33,7 @@ print(header)
 number_CIRs = data['cirs'].shape[0]
 num_CIRcomponents = data['cirs'].shape[2]
 selected = [0, 3, 1, 4]  # Channels regarding 0 = Bob>Alice, 3 = Alice>Bob, 1 = Bob>Eve, 4 = Alice>Eve
-data_points = np.zeros((len(selected), number_CIRs, num_CIRcomponents, 2), dtype=float) # is the shape correct?
+data_points = np.zeros((len(selected), number_CIRs, num_CIRcomponents, 2), dtype=float) 
 
 for idx, channel in enumerate(selected):
     data_points[idx, :, :, :] = data['cirs'][:number_CIRs, channel, :, :]
