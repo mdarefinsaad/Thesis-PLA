@@ -238,4 +238,10 @@ def estimate_cfo(signal_real, signal_imag):
 # # Get the coefficients (sparse representation)
 # coefficients = lasso.coef_
 
-# # print(f"Sparse Coefficients: {coefficients}")
+# # print(f"Sparse Coefficients: {coefficients}")#
+
+
+        # pca_attributes.append({
+        #     'components': pca.components_,
+        #     'explained_variance': pca.explained_variance_
+        # })
